@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id                 String            @id @default(uuid())
+  username           String
+  email              String            @unique
+  password           String
+  resetPasswordToken String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  posts              posts[]
+  previusPasswords   previusPassword[]
+}
+
+model previusPassword {
+  id        String   @id @default(uuid())
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  users     users?   @relation(fields: [userId], references: [id])
+}
+
+model posts {
+  id        String     @id @default(uuid())
+  title     String
+  content   String
+  status    postStatus @default(PUBLIC)
+  userId    String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user users? @relation(fields: [userId], references: [id])
+}
+
+enum postStatus {
+  PUBLIC
+  PRIVATE
+  DRAFT
+}
